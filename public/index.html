@@ -28,7 +28,7 @@
     <title>React App</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    
+
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -43,21 +43,5 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('service-worker.js').then(function(registration) {
-            console.log('Service Worker registration successful', registration.scope);
-          }, function(err) {
-            console.log('Service Worker registration failed', err);
-          }).catch(function(err) {
-            console.log(err);
-          });
-        });
-      } else {
-        console.log('Service Worker is not supported by browser.');
-      }
-    </script>
   </body>
 </html>
