@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Grommet } from 'grommet';
-import Content from './components/Content';
+import { grommet } from "grommet/themes";
+import Content from './components/Login';
+import Control from './components/Control';
 import firebase from "firebase";
 
 
@@ -42,8 +44,9 @@ class App extends Component {
 
   render() {
     return (
-      <Grommet>
+      <Grommet theme={grommet} full>
         { !this.state.authenticated && <Content login={ (user,password) => this.login(user, password) }/> } 
+        { this.state.authenticated && <Control firebase={ this.app } /> } 
       </Grommet>
     );
   }
