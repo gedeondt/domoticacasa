@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
 import { Box, Button, Tabs, Tab } from 'grommet';
 
+const PARADO =  0
+const SUBIENDO = 1
+const BAJANDO = 2
+
 export default class Control extends Component {
 
-  state = { blinds: false }
+  state = { blinds: null }
 
   toggleBlind(key, value) {
-    this.props.firebase.database().ref('persianas/'+key).set(!value);
+    if(this.state.blinds[key] != PARADO)
+    {
+      this.props.firebase.database().ref('persianas/'+key).set(PARADO);
+    } else {
+      this.props.firebase.database().ref('persianas/'+key).set(value);
+    }
   }
 
   componentWillMount() {
@@ -14,12 +23,22 @@ export default class Control extends Component {
   }
 
   renderBlinds(blinds) {
-      return Object.keys(blinds).map((key) => <Button
-        key={key}
-        label={key}
-        primary={blinds[key]}
-        onClick={() => this.toggleBlind(key, blinds[key]) }
-        />)
+      return Object.keys(blinds).map((key) => <div>
+        <Button
+          margin="small"
+          key={key}
+          label={"Subir " + key}
+          primary={blinds[key] > 0}
+          onClick={() => this.toggleBlind(key, SUBIENDO) }
+        />
+        <Button
+          margin="small"
+          key={key}
+          label={"Bajar " + key}
+          primary={blinds[key] > 0}
+          onClick={() => this.toggleBlind(key, BAJANDO) }
+        />
+    </div>)
   }
 
   render() {
