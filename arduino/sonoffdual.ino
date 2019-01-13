@@ -57,6 +57,13 @@ void loop() {
   
  new_state = Firebase.getInt("/persianas/salon1");
 
+ if (Firebase.failed())
+ {
+  Serial.print("setting number failed:");
+  Serial.println(Firebase.error());
+  ESP.reset();
+ }
+
  if(new_state != state)
  {
     state = new_state;
@@ -74,6 +81,11 @@ void loop() {
  
  Serial.println("________________________");
  delay(3000);
+
+ // Parpadeamos para saber que esta funcionando
+ digitalWrite(Led_1, false);
+ delay(300);
+ digitalWrite(Led_1, true);
 }
 
 void apagar()
