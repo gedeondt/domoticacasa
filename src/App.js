@@ -38,7 +38,6 @@ class App extends Component {
   }
 
   login(user, password) {
-    console.log(user, password)
     this.app.auth().signInWithEmailAndPassword(user, password)
   }
 
@@ -46,7 +45,7 @@ class App extends Component {
     return (
       <Grommet theme={grommet} full>
         { !this.state.authenticated && <Content login={ (user,password) => this.login(user, password) }/> } 
-        { this.state.authenticated && <Control firebase={ this.app } /> } 
+        { this.state.authenticated && <Control firebase={ this.app } user={this.state.currentUser} /> } 
       </Grommet>
     );
   }

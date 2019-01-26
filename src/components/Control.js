@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Box, Button, Tabs, Tab } from 'grommet';
+import _ from 'lodash';
 
 const PARADO =  0
 const SUBIENDO = 1
@@ -7,37 +8,55 @@ const BAJANDO = 2
 
 export default class Control extends Component {
 
-  state = { blinds: null }
+  state = { devices: null, mapping: null }
 
   toggleBlind(key, value) {
-    if(this.state.blinds[key] != PARADO)
+    const path = '/users/'+this.props.user.uid+'/'+key
+    const did = this.state.mapping[key].device
+    if(this.state.devices[did].value != PARADO)
     {
-      this.props.firebase.database().ref('persianas/'+key).set(PARADO);
+      this.props.firebase.database().ref(path).set(PARADO);
     } else {
-      this.props.firebase.database().ref('persianas/'+key).set(value);
+      this.props.firebase.database().ref(path).set(value);
     }
   }
 
   componentWillMount() {
-    this.props.firebase.database().ref('persianas').on('value', (snapshot) => this.setState({ blinds: snapshot.val() }) );
+    this.props.firebase.database().ref('/mapping').on('value', (snapshot) => this.setState({ mapping: snapshot.val() }) );
+    this.props.firebase.database().ref('/devices').on('value', (snapshot) => this.setState({ devices: snapshot.val() }) );
   }
 
-  renderBlinds(blinds) {
-      return Object.keys(blinds).map((key) => <div>
+  renderBlinds(mapping) {
+      return Object.keys(mapping).map((key) => <div key={key}>
         <Button
           margin="small"
-          key={key}
           label={"Subir " + key}
-          primary={blinds[key] > 0}
+          primary={mapping[key] > 0}
           onClick={() => this.toggleBlind(key, SUBIENDO) }
         />
         <Button
           margin="small"
-          key={key}
           label={"Bajar " + key}
-          primary={blinds[key] > 0}
+          primary={mapping[key] > 0}
           onClick={() => this.toggleBlind(key, BAJANDO) }
         />
+    </div>)
+  }
+
+  renderLights(mapping) {
+    return Object.keys(mapping).map((key) => <div key={key}>
+      <Button
+        margin="small"
+        label={"Encender " + key}
+        primary={mapping[key] > 0}
+        onClick={() => this.toggleBlind(key, SUBIENDO) }
+      />
+      <Button
+        margin="small"
+        label={"Apagar " + key}
+        primary={mapping[key] > 0}
+        onClick={() => this.toggleBlind(key, BAJANDO) }
+      />
     </div>)
   }
 
@@ -45,7 +64,18 @@ export default class Control extends Component {
     return (
         <Tabs flex>
             <Tab title="Persianas">
-                { this.state.blinds && this.renderBlinds(this.state.blinds) }
+                { this.state.mapping && 
+                    this.renderBlinds(
+                      _.pickBy(this.state.mapping, { 'type' : 'blind' })
+                    )
+                }
+            </Tab>
+            <Tab title="Iluminación">
+                { this.state.mapping && 
+                    this.renderLights(
+                      _.pickBy(this.state.mapping, { 'type' : 'light' })
+                    )
+                }
             </Tab>
         </Tabs>
     )
