@@ -10,13 +10,9 @@
 #define WIFI_PASSWORD ""
 
 #define VERSION 0
+#define TYPE "light"
 
 #define Relay_1 22
-#define Relay_2 23
-
-#define PARADO 0
-#define SUBIENDO 1
-#define BAJANDO 2
 
 #define RELAY_ON 0
 #define RELAY_OFF 1
@@ -113,9 +109,8 @@ void setupWifi() {
 void setup() {
 
   pinMode(Relay_1, OUTPUT);
-  pinMode(Relay_2, OUTPUT);
 
-  apagar();
+  digitalWrite(Relay_1, RELAY_OFF);
 
   Serial.begin(115200);
 
@@ -126,6 +121,8 @@ void setup() {
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.stream("/devices/"+WiFi.macAddress()+"/value", streamCallback);
   Firebase.setString("/devices/"+WiFi.macAddress()+"/ip", String(WiFi.localIP().toString()));
+  Firebase.setString("/devices/"+WiFi.macAddress()+"/type", TYPE);
+  Firebase.setInt("/devices/"+WiFi.macAddress()+"/version", VERSION);
 
 }
 
@@ -142,40 +139,16 @@ void loop() {
   delay(1000);
 }
 
-int state = PARADO;
-int new_state = PARADO;
-
 void streamCallback(streamResult event) {
 
   Serial.println("Cambio de estado: " + String(event.getInt()));
   
-  new_state = event.getInt();
-  if(new_state != state)
+  int new_state = event.getInt();
+  if(new_state == 0)
   {
-    state = new_state;
-    apagar();
-    if(state == SUBIENDO){ subir(); }
-    if(state == BAJANDO){ bajar(); }
+    digitalWrite(Relay_1, RELAY_OFF);
+  } else {
+    digitalWrite(Relay_1, RELAY_ON);
   }
-}
-
-void apagar()
-{
-   digitalWrite(Relay_1, RELAY_OFF);
-   digitalWrite(Relay_2, RELAY_OFF);
-   delay(300);
-}
-
-void subir()
-{
-   digitalWrite(Relay_1, RELAY_ON);
-   digitalWrite(Relay_2, RELAY_OFF);
-   delay(300);
-}
-
-void bajar()
-{
-   digitalWrite(Relay_1, RELAY_OFF);
-   digitalWrite(Relay_2, RELAY_ON);
-   delay(300);
+  
 }
